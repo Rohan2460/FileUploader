@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>Upload files to server</title>
+    </head>
+    <body>
+        <form action="/" method="post" enctype="multipart/form-data" id="form">
+            Upload File
+            <input type="file" name="file" id="file" />
+            <br />
+            <br />
+            <button type="submit">Upload</button>
+            <hr />
+            <progress id="progress" value="0" max="100"></progress>
+        </form>
+    </body>
+
+    <script>
+        const form = document.querySelector("#form");
+        const file = document.querySelector("#file");
+
+        form.addEventListener("submit", (event) => {
+            event.preventDefault();
+            let form_data = new FormData(form);
+
+            let ajax = new XMLHttpRequest();
+            ajax.open("POST", "/");
+            ajax.timeout = 4000;
+
+            ajax.addEventListener("readystatechange", () => {
+                if (ajax.readyState == 4) {
+                    // When the request is completed
+                    if (ajax.status == 200) {
+                        alert("File uploaded successfully!");
+                    } else if (ajax.status == 400 || ajax.status == 500) {
+                        alert(ajax.responseText); // Alert error message from server
+                    }
+                }
+            });
+
+            ajax.upload.addEventListener("progress", progressHandler);
+            ajax.send(form_data);
+        });
+
+        function progressHandler(event) {
+            var progress_bar = document.querySelector("#progress");
+            var percent = (event.loaded / event.total) * 100;
+            progress_bar.value = Math.round(percent);
+        }
+    </script>
+</html>
